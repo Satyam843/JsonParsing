@@ -17,7 +17,7 @@ class PaymentModel: Decodable {
     var used_credit:String?
     var wallet_balance:String?
     var auto_alert_datetime:String?
-    var is_active = false
+    var is_active : Bool?
     init(json:[String:Any]) {
         if let customer_id = json["customer_id"] as? String {
             self.customer_id = customer_id

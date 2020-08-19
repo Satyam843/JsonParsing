@@ -7,20 +7,22 @@
 //
 
 import UIKit
-
 class ViewController: UIViewController {
+    //IB Outlets
     @IBOutlet weak var tableView: UITableView!
+    //Variables
     var paymentWallet:PaymentModel?
+    //View life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         //getData()
         apiHitForWalletData()
-        
+        self.tableView.reloadData()
     }
+    //Private methods
     func apiHitForWalletData() {
         let params = ["access_token":"75fb17f1fe727af8ceef0225bee4f232"]
-      
         APIManager.sharedInstance.serverCall(apiName: API_NAME.get_customer_wallet, params: params as [String : AnyObject]?, httpMethod: HTTP_METHOD.POST) {(isSucceeded, response) in
            // ActivityIndicator.sharedInstance.hideActivityIndicator()
             if isSucceeded == true{
@@ -42,6 +44,7 @@ class ViewController: UIViewController {
             }
         }
     }
+   
 /*
 func getData()
 {
@@ -80,4 +83,37 @@ func getData()
   
 }*/
 }
+//extensions
+extension ViewController : UITableViewDelegate,UITableViewDataSource
+   {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 7
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TableTableViewCell
+        cell.lblCustomer.text = paymentWallet?.customer_id
+        cell.lblUserId.text = paymentWallet?.user_id
+        cell.lblwalletBalance.text = paymentWallet?.wallet_balance
+        cell.lblCreditLimit.text = paymentWallet?.credit_limit
+        cell.lblUsedCredit.text = paymentWallet?.used_credit
+        //cell.lblIsActive.text = paymentWallet?.is_active
+       // cell.lblUserId.
+        if ((paymentWallet?.is_active! = true) != nil)
+        {
+            cell.lblIsActive.text = "User is active"
+        }
+        else
+        {
+            cell.lblIsActive.text = "User is inactive"
+        }
+        cell.lblAutoAlertDateTime.text = paymentWallet?.auto_alert_datetime
+        return cell
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 200
+    }
+   }
 
