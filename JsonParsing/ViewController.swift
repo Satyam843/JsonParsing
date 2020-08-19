@@ -7,14 +7,42 @@
 //
 
 import UIKit
-class ViewController: UIViewController {
 
+class ViewController: UIViewController {
+    @IBOutlet weak var tableView: UITableView!
+    var paymentWallet:PaymentModel?
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        getData()
+        //getData()
+        apiHitForWalletData()
+        
     }
-
+    func apiHitForWalletData() {
+        let params = ["access_token":"75fb17f1fe727af8ceef0225bee4f232"]
+      
+        APIManager.sharedInstance.serverCall(apiName: API_NAME.get_customer_wallet, params: params as [String : AnyObject]?, httpMethod: HTTP_METHOD.POST) {(isSucceeded, response) in
+           // ActivityIndicator.sharedInstance.hideActivityIndicator()
+            if isSucceeded == true{
+                if let data = response["data"] as? [String:Any]{
+                    self.paymentWallet = PaymentModel(json: data)
+                    Singleton.sharedInstance.paymentWallet = PaymentModel(json: data)
+                   // self.apiHitForTranxHistory(startDateParam: self.beginDay, endDateParam: self.endDay)
+                }
+            }else {
+                if let statusCode = response["status"] as? Int{
+                    print(response)
+                    if statusCode == STATUS_CODES.BAD_REQUEST{
+                        
+                    }else{
+                        print("error found")
+                    }
+                }
+                
+            }
+        }
+    }
+/*
 func getData()
 {
     let urlName = "https://api-7033.tookanapp.com:444/get_customer_wallet"
@@ -36,8 +64,12 @@ func getData()
         {
             do
             {
-                let json = try JSONSerialization.jsonObject(with: data, options: [])
-                print(json)
+               // let json = try JSONSerialization.jsonObject(with: data, options: [])
+                //self.array_data = try JSONDecoder().decode([PaymentModel].self, from: data)
+                self.array_data = try JSONDecoder().decode(PaymentModel.self, from: data)
+                print(self.array_data?.customer_id)
+                //print(json)
+ 
             }
             catch
             {
@@ -45,25 +77,7 @@ func getData()
             }
         }
     }.resume()
-  /*  let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-        guard let dataResponse = data,
-        error == nil
-        else
-        {
-            print(error?.localizedDescription ?? "error in parsing")
-            return
-        }
-        do
-        {
-            let jsonResponse = try JSONSerialization.jsonObject(with: dataResponse, options: [])
-            print(jsonResponse)
-        }
-        catch let parsingError
-        {
-            print("Error",parsingError)
-        }
-    }*/
-    //task.resume()
-}
+  
+}*/
 }
 
